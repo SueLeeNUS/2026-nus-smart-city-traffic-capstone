@@ -1,1 +1,30 @@
-
+2026-10-17 17:46:12 | INFO     | pipeline | Cleaning stage started
+2026-10-17 17:46:12 | INFO     | pipeline | Loaded raw file data/raw/Metro_Interstate_Traffic_Volume.csv: 48204 rows, 9 columns
+2026-10-17 17:46:12 | INFO     | pipeline | Schema check passed: all 9 expected columns present
+2026-10-17 17:46:12 | INFO     | pipeline | Standardised categoricals: 48143 holiday 'None' values relabelled 'No Holiday' (a real value, not missing); 3 rows otherwise changed in capitalisation/whitespace
+2026-10-17 17:46:12 | INFO     | pipeline | Parsed date_time: all 48204 values valid (range 2012-10-02 09:00:00 to 2018-09-30 23:00:00)
+2026-10-17 17:46:12 | INFO     | pipeline | Numeric check: all numeric columns valid, no missing values
+2026-10-17 17:46:12 | WARNING  | pipeline | Dropped 17 rows: exact duplicate of another row
+2026-10-17 17:46:12 | WARNING  | pipeline | Dropped 7612 rows: repeated timestamp (extra weather label for the same hour; kept the first row per hour)
+2026-10-17 17:46:12 | WARNING  | pipeline | Imputed 10 rows in 'temp' with the same-month median: impossible temperature (outside 200.0-330.0 K, e.g. 0 K sensor error)
+2026-10-17 17:46:12 | WARNING  | pipeline | Imputed 1 rows in 'rain_1h' with the same-month median: implausible rainfall (above 500.0 mm/hour or negative)
+2026-10-17 17:46:12 | INFO     | pipeline | No implausible snowfall (above 500.0 mm/hour or negative) found in snow_1h
+2026-10-17 17:46:12 | INFO     | pipeline | No cloud cover outside 0-100 % found in clouds_all
+2026-10-17 17:46:12 | INFO     | pipeline | traffic_volume check: all values within 0-10000
+2026-10-17 17:46:12 | INFO     | pipeline | Saved cleaned data to data/processed/traffic_clean.csv: 40575 rows, 9 columns
+2026-10-17 17:46:12 | INFO     | feature_engineering | Feature engineering started: shape before = 40575 rows x 9 columns
+2026-10-17 17:46:12 | INFO     | feature_engineering | Added time features: hour, day_of_week, month, year, is_weekend, is_rush_hour, and sine/cosine pairs for hour, day of week and month
+2026-10-17 17:46:12 | INFO     | feature_engineering | Added weather features: is_holiday, temp_c, is_raining, is_snowing, is_low_visibility, is_precipitation, is_severe_weather and 11 one-hot weather columns
+2026-10-17 17:46:12 | INFO     | feature_engineering | Added scaled features: temp_c_scaled (z-score), clouds_scaled and rain_scaled (min-max 0-1)
+2026-10-17 17:46:12 | INFO     | feature_engineering | Added congestion_category (quartile-based) with counts {'Low': 10144, 'Medium': 10144, 'High': 10145, 'Severe': 10142}
+2026-10-17 17:46:12 | INFO     | feature_engineering | Feature engineering finished: shape after = 40575 rows x 43 columns
+2026-10-17 17:46:13 | INFO     | feature_engineering | Saved feature dataset to data/processed/traffic_features.csv
+2026-10-17 17:46:13 | INFO     | visualizations | Visualisation stage started: 40575 rows loaded
+2026-10-17 17:46:14 | INFO     | visualizations | Saved figure: figures/01_traffic_by_hour.png
+2026-10-17 17:46:14 | INFO     | visualizations | Saved figure: figures/02_traffic_distribution.png
+2026-10-17 17:46:14 | WARNING  | visualizations | Weather chart omits 2 categories with fewer than 100 hours: Smoke, Squall
+2026-10-17 17:46:14 | INFO     | visualizations | Saved figure: figures/03_traffic_by_weather.png
+2026-10-17 17:46:14 | INFO     | visualizations | Saved figure: figures/04_temperature_vs_traffic.png
+2026-10-17 17:46:14 | INFO     | visualizations | Saved figure: figures/05_congestion_heatmap.png
+2026-10-17 17:46:14 | INFO     | visualizations | Saved figure interpretations: figures/figure_interpretations.md
+2026-10-17 17:46:14 | INFO     | __main__ | All stages completed successfully
