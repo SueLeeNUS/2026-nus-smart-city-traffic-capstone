@@ -36,9 +36,9 @@ INTERPRETATIONS = {
         "The distribution is not a single bell shape. There is a large spike of quiet overnight hours "
         "below about 1,000 vehicles, a middle group near 2,800 and a busy group around 4,500 to "
         "5,000. The quartile lines show where the Low / Medium / High / Severe congestion "
-        "categories begin (1,248 / 3,427 / 4,952), so Severe means roughly the busiest quarter of hours."),
+        "categories begin (1,249 / 3,428 / 4,952), so Severe means roughly the busiest quarter of hours."),
     "03_traffic_by_weather.png": (
-        "Average traffic is highest in cloudy and hazy hours (about 3,600) and lowest in fog (about 2,700) and mist. "
+        "Average traffic is highest in cloudy and hazy hours (about 3,600 to 3,700) and lowest in fog (about 2,650) and mist. "
         "Weather type is also tied to time of day (for example, fog is common at night), so this "
         "chart should not be read as weather causing the difference."),
     "04_temperature_vs_traffic.png": (
