@@ -6,6 +6,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from config import LOW_VISIBILITY_WEATHER, PRECIPITATION_WEATHER, SEVERE_WEATHER
+
 logger = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -20,10 +22,6 @@ def _rel(path):
     except ValueError:
         return path
 
-# Weather groups (reused in Part 3 for the proxy accident-risk label)
-LOW_VISIBILITY_WEATHER = ["Fog", "Mist", "Haze", "Smoke"]
-SEVERE_WEATHER = ["Thunderstorm", "Snow", "Squall"]
-PRECIPITATION_WEATHER = ["Rain", "Drizzle", "Snow", "Thunderstorm", "Squall"]
 RUSH_HOURS = [7, 8, 16, 17, 18]  # from Part 1: peaks at 07:00 and 16:00-17:00
 
 CONGESTION_LABELS = ["Low", "Medium", "High", "Severe"]
