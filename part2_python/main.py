@@ -23,11 +23,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Run the traffic analytics pipeline end to end.")
     parser.add_argument("--debug", action="store_true", help="show DEBUG messages")
     parser.add_argument("--log-file", default=str(BASE_DIR / "pipeline.log"))
+    parser.add_argument("--raw-path", default=str(pipeline.RAW_PATH), help="raw CSV to process")
+    parser.add_argument("--append-log", action="store_true", help="add to the log file instead of replacing it")
     args = parser.parse_args()
-    setup_logging(args.log_file, debug=args.debug)
+    setup_logging(args.log_file, debug=args.debug, file_mode="a" if args.append_log else "w")
 
     try:
-        pipeline.run_pipeline()
+        pipeline.run_pipeline(Path(args.raw_path))
         feature_engineering.run_feature_engineering()
         visualizations.run_visualizations()
     except pipeline.PipelineError:
@@ -41,4 +43,7 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    # Re-import under the name "main" so log lines show a clear module name
+    from main import main as _main
+
+    sys.exit(_main())

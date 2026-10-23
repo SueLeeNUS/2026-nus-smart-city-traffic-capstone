@@ -11,6 +11,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from config import WEATHER_SEVERITY_ORDER
+
 logger = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -137,66 +139,115 @@ def remove_exact_duplicates(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def resolve_repeated_timestamps(df: pd.DataFrame) -> pd.DataFrame:
-    """Several rows can describe the same hour (extra weather labels).
-    Traffic volume is identical within an hour, so we keep one row per hour:
-    the first one in file order."""
-    n = int(df["date_time"].duplicated().sum())
-    if n:
-        # Check our assumption that traffic is the same within a repeated hour
+def collect_holiday_dates(df: pd.DataFrame) -> dict:
+    """Remember which calendar dates are holidays (before rows are collapsed).
+    In the raw file only the 00:00 row of a holiday carries its name."""
+    flagged = df[df["holiday"] != "No Holiday"]
+    holiday_by_date = {}
+    for ts, name in zip(flagged["date_time"], flagged["holiday"]):
+        holiday_by_date.setdefault(ts.date(), name)
+    logger.debug("Holiday dates found in raw data: %d", len(holiday_by_date))
+    return holiday_by_date
+
+
+def collapse_to_hourly(df: pd.DataFrame) -> pd.DataFrame:
+    """GRAIN RULE: keep exactly one row per hour.
+
+    The raw file lists an hour once per weather description, with identical traffic.
+    We keep the row with the most severe weather_main (order in config.py), breaking
+    ties alphabetically by weather_description, the same rule as the SQL view
+    traffic_hourly in Part 1."""
+    n_extra = int(df["date_time"].duplicated().sum())
+    if n_extra:
         varying = int((df.groupby("date_time")["traffic_volume"].nunique() > 1).sum())
         if varying:
-            logger.warning("%d repeated hours have differing traffic_volume; keeping first row", varying)
+            logger.warning("%d repeated hours have differing traffic_volume; keeping most severe row", varying)
+        hours_with_copies = int((df.groupby("date_time").size() > 1).sum())
+        logger.debug("%d hours appear more than once in the data", hours_with_copies)
+        rank_map = {w: i for i, w in enumerate(WEATHER_SEVERITY_ORDER)}
+        rank = df["weather_main"].map(rank_map).fillna(len(WEATHER_SEVERITY_ORDER))
+        ordered = (df.assign(_severity=rank)
+                     .sort_values(["date_time", "_severity", "weather_description"], kind="mergesort"))
+        df = ordered.drop_duplicates(subset="date_time", keep="first").drop(columns="_severity")
         logger.warning(
-            "Dropped %d rows: repeated timestamp (extra weather label for the same hour; "
-            "kept the first row per hour)", n)
-        df = df.drop_duplicates(subset="date_time", keep="first")
+            "Dropped %d rows: repeated hour (kept one row per hour, the most severe weather_main; "
+            "traffic volume is identical across the copies)", n_extra)
     else:
         logger.info("No repeated timestamps found")
     return df
 
 
-def _monthly_median_impute(df: pd.DataFrame, col: str, bad_mask: pd.Series, reason: str) -> pd.DataFrame:
-    """Replace flagged values with the median of VALID values in the same
-    calendar month (group-by-group, loop over months). Falls back to the
-    overall median if a month has no valid values."""
+def verify_unique_hours(df: pd.DataFrame) -> None:
+    """Fail loudly if the one-row-per-hour rule did not hold."""
+    if df["date_time"].duplicated().any():
+        raise PipelineError("date_time is not unique after collapsing to hourly rows")
+    logger.info("Verified: date_time is unique, %d hourly rows", len(df))
+
+
+def fill_holiday_across_day(df: pd.DataFrame, holiday_by_date: dict) -> pd.DataFrame:
+    """Copy each holiday's name to every hour of that calendar date.
+    In the raw file only 00:00 is flagged, so the flag is almost useless as a feature."""
+    df = df.copy()
+    before = int((df["holiday"] != "No Holiday").sum())
+    dates = df["date_time"].dt.date
+    filled = dates.map(holiday_by_date)
+    df["holiday"] = filled.fillna("No Holiday")
+    after = int((df["holiday"] != "No Holiday").sum())
+    n_dates = int(df.loc[df["holiday"] != "No Holiday", "date_time"].dt.date.nunique())
+    if after != before:
+        logger.warning(
+            "Modified %d rows: holiday label filled across the whole calendar day "
+            "(flagged hours %d -> %d, across %d holiday dates)", after - before, before, after, n_dates)
+    else:
+        logger.info("Holiday label already covers whole days (%d hours, %d dates)", after, n_dates)
+    return df
+
+
+def _median_impute(df: pd.DataFrame, col: str, bad_mask: pd.Series, reason: str,
+                   by_hour: bool = False) -> pd.DataFrame:
+    """Replace flagged values with the median of VALID values in the same calendar
+    month (and, if by_hour, the same hour of day). Done group by group in a loop.
+    Falls back to the overall median if a group has no valid values."""
     df = df.copy()
     n = int(bad_mask.sum())
     if n == 0:
         logger.info("No %s found in %s", reason, col)
         return df
     months = df["date_time"].dt.month
+    hours = df["date_time"].dt.hour
+    key = months * 100 + hours if by_hour else months
     overall_median = float(df.loc[~bad_mask, col].median())
-    imputed_counts = {}
-    for month in sorted(months[bad_mask].unique()):
-        valid_in_month = df.loc[(months == month) & ~bad_mask, col]
-        if len(valid_in_month) > 0:
-            replacement = float(valid_in_month.median())
-        else:
-            replacement = overall_median
-        target = bad_mask & (months == month)
+    for group in sorted(key[bad_mask].unique()):
+        valid_in_group = df.loc[(key == group) & ~bad_mask, col]
+        replacement = float(valid_in_group.median()) if len(valid_in_group) > 0 else overall_median
+        if pd.api.types.is_integer_dtype(df[col]):
+            replacement = int(round(replacement))  # whole-number columns stay whole numbers
+        target = bad_mask & (key == group)
         df.loc[target, col] = replacement
-        imputed_counts[int(month)] = (int(target.sum()), round(replacement, 3))
-        logger.debug("%s: month %d -> %d rows set to monthly median %.3f",
-                     col, month, int(target.sum()), replacement)
-    logger.warning("Imputed %d rows in '%s' with the same-month median: %s", n, col, reason)
+        label = f"month {group // 100} hour {group % 100:02d}" if by_hour else f"month {group}"
+        logger.debug("%s: %s -> %d rows set to median %.3f", col, label, int(target.sum()), replacement)
+    scope = "same-month-and-hour" if by_hour else "same-month"
+    logger.warning("Imputed %d rows in '%s' with the %s median: %s", n, col, scope, reason)
     return df
 
 
 def handle_outliers(df: pd.DataFrame) -> pd.DataFrame:
     """Impossible values -> monthly median (see _monthly_median_impute)."""
-    df = _monthly_median_impute(
+    df = _median_impute(
         df, "temp", (df["temp"] < MIN_TEMP_K) | (df["temp"] > MAX_TEMP_K),
         f"impossible temperature (outside {MIN_TEMP_K}-{MAX_TEMP_K} K, e.g. 0 K sensor error)")
-    df = _monthly_median_impute(
+    df = _median_impute(
         df, "rain_1h", (df["rain_1h"] < 0) | (df["rain_1h"] > MAX_RAIN_MM_PER_HOUR),
         f"implausible rainfall (above {MAX_RAIN_MM_PER_HOUR} mm/hour or negative)")
-    df = _monthly_median_impute(
+    df = _median_impute(
         df, "snow_1h", (df["snow_1h"] < 0) | (df["snow_1h"] > MAX_SNOW_MM_PER_HOUR),
         f"implausible snowfall (above {MAX_SNOW_MM_PER_HOUR} mm/hour or negative)")
-    df = _monthly_median_impute(
+    df = _median_impute(
         df, "clouds_all", (df["clouds_all"] < 0) | (df["clouds_all"] > 100),
         "cloud cover outside 0-100 %")
+    df = _median_impute(
+        df, "traffic_volume", df["traffic_volume"] == 0,
+        "zero vehicles for a full hour on a major interstate (sensor dropout)", by_hour=True)
     bad_traffic = (df["traffic_volume"] < 0) | (df["traffic_volume"] > MAX_TRAFFIC)
     if int(bad_traffic.sum()):
         logger.warning("Dropped %d rows: traffic_volume outside 0-%d", int(bad_traffic.sum()), MAX_TRAFFIC)
@@ -212,7 +263,10 @@ def clean(df: pd.DataFrame) -> pd.DataFrame:
     df = parse_datetimes(df)
     df = coerce_numeric(df)
     df = remove_exact_duplicates(df)
-    df = resolve_repeated_timestamps(df)
+    holiday_by_date = collect_holiday_dates(df)
+    df = collapse_to_hourly(df)
+    verify_unique_hours(df)
+    df = fill_holiday_across_day(df, holiday_by_date)
     df = handle_outliers(df)
     df = df.sort_values("date_time").reset_index(drop=True)
     return df

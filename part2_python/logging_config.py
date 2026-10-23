@@ -45,3 +45,8 @@ def setup_logging(
     root.setLevel(logging.DEBUG if debug else logging.INFO)
     root.addHandler(file_handler)
     root.addHandler(console_handler)
+
+    # Third-party libraries (matplotlib, PIL) are very chatty at DEBUG level; keep them quiet
+    # so our own DEBUG messages stay readable.
+    for noisy in ("matplotlib", "PIL"):
+        logging.getLogger(noisy).setLevel(logging.WARNING)
