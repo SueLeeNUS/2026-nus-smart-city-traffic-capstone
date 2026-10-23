@@ -1,30 +1,87 @@
-2026-10-17 17:46:12 | INFO     | pipeline | Cleaning stage started
-2026-10-17 17:46:12 | INFO     | pipeline | Loaded raw file data/raw/Metro_Interstate_Traffic_Volume.csv: 48204 rows, 9 columns
-2026-10-17 17:46:12 | INFO     | pipeline | Schema check passed: all 9 expected columns present
-2026-10-17 17:46:12 | INFO     | pipeline | Standardised categoricals: 48143 holiday 'None' values relabelled 'No Holiday' (a real value, not missing); 3 rows otherwise changed in capitalisation/whitespace
-2026-10-17 17:46:12 | INFO     | pipeline | Parsed date_time: all 48204 values valid (range 2012-10-02 09:00:00 to 2018-09-30 23:00:00)
-2026-10-17 17:46:12 | INFO     | pipeline | Numeric check: all numeric columns valid, no missing values
-2026-10-17 17:46:12 | WARNING  | pipeline | Dropped 17 rows: exact duplicate of another row
-2026-10-17 17:46:12 | WARNING  | pipeline | Dropped 7612 rows: repeated timestamp (extra weather label for the same hour; kept the first row per hour)
-2026-10-17 17:46:12 | WARNING  | pipeline | Imputed 10 rows in 'temp' with the same-month median: impossible temperature (outside 200.0-330.0 K, e.g. 0 K sensor error)
-2026-10-17 17:46:12 | WARNING  | pipeline | Imputed 1 rows in 'rain_1h' with the same-month median: implausible rainfall (above 500.0 mm/hour or negative)
-2026-10-17 17:46:12 | INFO     | pipeline | No implausible snowfall (above 500.0 mm/hour or negative) found in snow_1h
-2026-10-17 17:46:12 | INFO     | pipeline | No cloud cover outside 0-100 % found in clouds_all
-2026-10-17 17:46:12 | INFO     | pipeline | traffic_volume check: all values within 0-10000
-2026-10-17 17:46:12 | INFO     | pipeline | Saved cleaned data to data/processed/traffic_clean.csv: 40575 rows, 9 columns
-2026-10-17 17:46:12 | INFO     | feature_engineering | Feature engineering started: shape before = 40575 rows x 9 columns
-2026-10-17 17:46:12 | INFO     | feature_engineering | Added time features: hour, day_of_week, month, year, is_weekend, is_rush_hour, and sine/cosine pairs for hour, day of week and month
-2026-10-17 17:46:12 | INFO     | feature_engineering | Added weather features: is_holiday, temp_c, is_raining, is_snowing, is_low_visibility, is_precipitation, is_severe_weather and 11 one-hot weather columns
-2026-10-17 17:46:12 | INFO     | feature_engineering | Added scaled features: temp_c_scaled (z-score), clouds_scaled and rain_scaled (min-max 0-1)
-2026-10-17 17:46:12 | INFO     | feature_engineering | Added congestion_category (quartile-based) with counts {'Low': 10144, 'Medium': 10144, 'High': 10145, 'Severe': 10142}
-2026-10-17 17:46:12 | INFO     | feature_engineering | Feature engineering finished: shape after = 40575 rows x 43 columns
-2026-10-17 17:46:13 | INFO     | feature_engineering | Saved feature dataset to data/processed/traffic_features.csv
-2026-10-17 17:46:13 | INFO     | visualizations | Visualisation stage started: 40575 rows loaded
-2026-10-17 17:46:14 | INFO     | visualizations | Saved figure: figures/01_traffic_by_hour.png
-2026-10-17 17:46:14 | INFO     | visualizations | Saved figure: figures/02_traffic_distribution.png
-2026-10-17 17:46:14 | WARNING  | visualizations | Weather chart omits 2 categories with fewer than 100 hours: Smoke, Squall
-2026-10-17 17:46:14 | INFO     | visualizations | Saved figure: figures/03_traffic_by_weather.png
-2026-10-17 17:46:14 | INFO     | visualizations | Saved figure: figures/04_temperature_vs_traffic.png
-2026-10-17 17:46:14 | INFO     | visualizations | Saved figure: figures/05_congestion_heatmap.png
-2026-10-17 17:46:14 | INFO     | visualizations | Saved figure interpretations: figures/figure_interpretations.md
-2026-10-17 17:46:14 | INFO     | __main__ | All stages completed successfully
+2026-10-23 20:51:55 | INFO     | pipeline | Cleaning stage started
+2026-10-23 20:51:55 | INFO     | pipeline | Loaded raw file data/raw/Metro_Interstate_Traffic_Volume.csv: 48204 rows, 9 columns
+2026-10-23 20:51:55 | INFO     | pipeline | Schema check passed: all 9 expected columns present
+2026-10-23 20:51:55 | INFO     | pipeline | Standardised categoricals: 48143 holiday 'None' values relabelled 'No Holiday' (a real value, not missing); 3 rows otherwise changed in capitalisation/whitespace
+2026-10-23 20:51:55 | INFO     | pipeline | Parsed date_time: all 48204 values valid (range 2012-10-02 09:00:00 to 2018-09-30 23:00:00)
+2026-10-23 20:51:55 | INFO     | pipeline | Numeric check: all numeric columns valid, no missing values
+2026-10-23 20:51:55 | WARNING  | pipeline | Dropped 17 rows: exact duplicate of another row
+2026-10-23 20:51:55 | DEBUG    | pipeline | Holiday dates found in raw data: 53
+2026-10-23 20:51:55 | DEBUG    | pipeline | 5430 hours appear more than once in the data
+2026-10-23 20:51:55 | WARNING  | pipeline | Dropped 7612 rows: repeated hour (kept one row per hour, the most severe weather_main; traffic volume is identical across the copies)
+2026-10-23 20:51:55 | INFO     | pipeline | Verified: date_time is unique, 40575 hourly rows
+2026-10-23 20:51:55 | WARNING  | pipeline | Modified 1150 rows: holiday label filled across the whole calendar day (flagged hours 53 -> 1203, across 53 holiday dates)
+2026-10-23 20:51:55 | DEBUG    | pipeline | temp: month 1 -> 4 rows set to median 265.480
+2026-10-23 20:51:55 | DEBUG    | pipeline | temp: month 2 -> 6 rows set to median 265.895
+2026-10-23 20:51:55 | WARNING  | pipeline | Imputed 10 rows in 'temp' with the same-month median: impossible temperature (outside 200.0-330.0 K, e.g. 0 K sensor error)
+2026-10-23 20:51:55 | DEBUG    | pipeline | rain_1h: month 7 -> 1 rows set to median 0.000
+2026-10-23 20:51:55 | WARNING  | pipeline | Imputed 1 rows in 'rain_1h' with the same-month median: implausible rainfall (above 500.0 mm/hour or negative)
+2026-10-23 20:51:55 | INFO     | pipeline | No implausible snowfall (above 500.0 mm/hour or negative) found in snow_1h
+2026-10-23 20:51:55 | INFO     | pipeline | No cloud cover outside 0-100 % found in clouds_all
+2026-10-23 20:51:55 | DEBUG    | pipeline | traffic_volume: month 7 hour 18 -> 1 rows set to median 4279.000
+2026-10-23 20:51:55 | DEBUG    | pipeline | traffic_volume: month 7 hour 23 -> 1 rows set to median 1388.000
+2026-10-23 20:51:55 | WARNING  | pipeline | Imputed 2 rows in 'traffic_volume' with the same-month-and-hour median: zero vehicles for a full hour on a major interstate (sensor dropout)
+2026-10-23 20:51:55 | INFO     | pipeline | traffic_volume check: all values within 0-10000
+2026-10-23 20:51:55 | INFO     | pipeline | Saved cleaned data to data/processed/traffic_clean.csv: 40575 rows, 9 columns
+2026-10-23 20:51:55 | INFO     | feature_engineering | Feature engineering started: shape before = 40575 rows x 9 columns
+2026-10-23 20:51:55 | INFO     | feature_engineering | Added time features: hour, day_of_week, month, year, is_weekend, is_rush_hour, and sine/cosine pairs for hour, day of week and month
+2026-10-23 20:51:55 | INFO     | feature_engineering | Added weather features: is_holiday, temp_c, is_raining, is_snowing, is_low_visibility, is_precipitation, is_severe_weather and 11 one-hot weather columns
+2026-10-23 20:51:55 | DEBUG    | feature_engineering | temp_c mean=8.2323 std=13.0938 (used for z-score)
+2026-10-23 20:51:55 | DEBUG    | feature_engineering | clouds_all min=0 max=100 (used for min-max)
+2026-10-23 20:51:55 | DEBUG    | feature_engineering | log1p(rain_1h) max=4.0365 (used for min-max)
+2026-10-23 20:51:55 | INFO     | feature_engineering | Added scaled features: temp_c_scaled (z-score), clouds_scaled and rain_scaled (min-max 0-1)
+2026-10-23 20:51:55 | DEBUG    | feature_engineering | Congestion quartile thresholds: Q1=1249.0 Q2=3428.0 Q3=4952.0
+2026-10-23 20:51:55 | INFO     | feature_engineering | Added congestion_category (quartile-based) with counts {'Low': 10146, 'Medium': 10142, 'High': 10145, 'Severe': 10142}
+2026-10-23 20:51:55 | INFO     | feature_engineering | Feature engineering finished: shape after = 40575 rows x 43 columns
+2026-10-23 20:51:56 | INFO     | feature_engineering | Saved feature dataset to data/processed/traffic_features.csv
+2026-10-23 20:51:56 | INFO     | visualizations | Visualisation stage started: 40575 rows loaded
+2026-10-23 20:51:56 | INFO     | visualizations | Saved figure: figures/01_traffic_by_hour.png
+2026-10-23 20:51:56 | DEBUG    | visualizations | Distribution plot quartiles: 1249.0 3428.0 4952.0
+2026-10-23 20:51:57 | INFO     | visualizations | Saved figure: figures/02_traffic_distribution.png
+2026-10-23 20:51:57 | WARNING  | visualizations | Weather chart omits 2 categories with fewer than 100 hours: Smoke, Squall
+2026-10-23 20:51:57 | INFO     | visualizations | Saved figure: figures/03_traffic_by_weather.png
+2026-10-23 20:51:57 | DEBUG    | visualizations | Temperature-traffic correlation: 0.1396
+2026-10-23 20:51:57 | INFO     | visualizations | Saved figure: figures/04_temperature_vs_traffic.png
+2026-10-23 20:51:57 | INFO     | visualizations | Saved figure: figures/05_congestion_heatmap.png
+2026-10-23 20:51:57 | INFO     | visualizations | Saved figure interpretations: figures/figure_interpretations.md
+2026-10-23 20:51:57 | INFO     | main | All stages completed successfully
+2026-10-23 20:51:58 | INFO     | pipeline | Cleaning stage started
+2026-10-23 20:51:58 | ERROR    | main | Pipeline cannot complete; exiting
+Traceback (most recent call last):
+  File "/home/claude/part2_python/pipeline.py", line 54, in load_raw
+    df = pd.read_csv(path, keep_default_na=False, na_values=[""])
+  File "/usr/local/lib/python3.13/dist-packages/pandas/io/parsers/readers.py", line 873, in read_csv
+    return _read(filepath_or_buffer, kwds)
+  File "/usr/local/lib/python3.13/dist-packages/pandas/io/parsers/readers.py", line 300, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+  File "/usr/local/lib/python3.13/dist-packages/pandas/io/parsers/readers.py", line 1645, in __init__
+    self._engine = self._make_engine(f, self.engine)
+                   ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/dist-packages/pandas/io/parsers/readers.py", line 1904, in _make_engine
+    self.handles = get_handle(
+                   ~~~~~~~~~~^
+        f,
+        ^^
+    ...<6 lines>...
+        storage_options=self.options.get("storage_options", None),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/local/lib/python3.13/dist-packages/pandas/io/common.py", line 930, in get_handle
+    handle = open(
+        handle,
+    ...<3 lines>...
+        newline="",
+    )
+FileNotFoundError: [Errno 2] No such file or directory: 'data/raw/does_not_exist.csv'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/claude/part2_python/main.py", line 32, in main
+    pipeline.run_pipeline(Path(args.raw_path))
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/part2_python/pipeline.py", line 280, in run_pipeline
+    df = load_raw(raw_path)
+  File "/home/claude/part2_python/pipeline.py", line 56, in load_raw
+    raise PipelineError(f"Raw file not found: {path}") from exc
+pipeline.PipelineError: Raw file not found: data/raw/does_not_exist.csv
