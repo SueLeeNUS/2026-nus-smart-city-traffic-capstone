@@ -1,13 +1,13 @@
-2026-10-17 17:46:15 | INFO     | traffic_app | Command invoked: at with arguments {'command': 'at', 'datetime': '2017-05-12 16:00'}
-2026-10-17 17:46:15 | INFO     | traffic_app | Loaded 40575 rows from traffic_features.csv
-2026-10-17 17:46:15 | INFO     | traffic_app | Command invoked: peaks with arguments {'command': 'peaks', 'top': 3, 'day_type': 'all'}
-2026-10-17 17:46:15 | INFO     | traffic_app | Loaded 40575 rows from traffic_features.csv
-2026-10-17 17:46:16 | INFO     | traffic_app | Command invoked: compare with arguments {'command': 'compare'}
-2026-10-17 17:46:16 | INFO     | traffic_app | Loaded 40575 rows from traffic_features.csv
-2026-10-17 17:46:16 | INFO     | traffic_app | Command invoked: recommend with arguments {'command': 'recommend', 'day': 'Fri', 'top': 3}
-2026-10-17 17:46:16 | INFO     | traffic_app | Loaded 40575 rows from traffic_features.csv
-2026-10-17 17:46:17 | INFO     | traffic_app | Command invoked: weather with arguments {'command': 'weather', 'condition': 'Rain'}
-2026-10-17 17:46:17 | INFO     | traffic_app | Loaded 40575 rows from traffic_features.csv
-2026-10-17 17:46:17 | INFO     | traffic_app | Command invoked: at with arguments {'command': 'at', 'datetime': '12/05/2017'}
-2026-10-17 17:46:17 | INFO     | traffic_app | Loaded 40575 rows from traffic_features.csv
-2026-10-17 17:46:17 | ERROR    | traffic_app | Invalid input: '12/05/2017' is not a valid date/time. Use the format YYYY-MM-DD HH:MM, for example 2017-05-12 16:00.
+2026-10-23 20:51:13 | INFO     | traffic_app | Command invoked: at with arguments {'command': 'at', 'datetime': '2017-05-12 16:00'}
+2026-10-23 20:51:14 | INFO     | traffic_app | Loaded 40575 rows from traffic_features.csv
+2026-10-23 20:51:14 | INFO     | traffic_app | Command invoked: peaks with arguments {'command': 'peaks', 'top': 3, 'day_type': 'weekday'}
+2026-10-23 20:51:14 | INFO     | traffic_app | Loaded 40575 rows from traffic_features.csv
+2026-10-23 20:51:14 | INFO     | traffic_app | Command invoked: compare with arguments {'command': 'compare'}
+2026-10-23 20:51:15 | INFO     | traffic_app | Loaded 40575 rows from traffic_features.csv
+2026-10-23 20:51:15 | INFO     | traffic_app | Command invoked: recommend with arguments {'command': 'recommend', 'day': 'Fri', 'top': 3}
+2026-10-23 20:51:15 | INFO     | traffic_app | Loaded 40575 rows from traffic_features.csv
+2026-10-23 20:51:15 | INFO     | traffic_app | Command invoked: weather with arguments {'command': 'weather', 'condition': 'Rain'}
+2026-10-23 20:51:16 | INFO     | traffic_app | Loaded 40575 rows from traffic_features.csv
+2026-10-23 20:51:16 | INFO     | traffic_app | Command invoked: at with arguments {'command': 'at', 'datetime': '12/05/2017'}
+2026-10-23 20:51:16 | INFO     | traffic_app | Loaded 40575 rows from traffic_features.csv
+2026-10-23 20:51:16 | ERROR    | traffic_app | Invalid input: '12/05/2017' is not a valid date/time. Use the format YYYY-MM-DD HH:MM, for example 2017-05-12 16:00.
