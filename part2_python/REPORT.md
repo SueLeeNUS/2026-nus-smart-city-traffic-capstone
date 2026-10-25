@@ -26,8 +26,9 @@ so the processing can be audited, and every data rule matches the Part 1 SQL vie
 - **Fills the holiday flag across the whole day.** Only 00:00 was flagged (53 hours), so the flag carried almost no signal. It
   now covers **1,203 hours across 53 holiday dates**.
 - Replaces 10 impossible 0 K temperatures and one 9,831 mm rainfall reading with the median of valid readings in
-  the same calendar month, and 2 zero-traffic hours (23 July 2016, 18:00 and 23:00, sensor dropouts) with the median
-  for the same month and hour. Each is calculated group by group in a loop, not with one global average.
+  the same calendar month, and 2 zero-traffic hours (23 July 2016, 18:00 and 23:00, inside the outage described in Section 5) with the median
+  for the same month and hour. Medians pool all years (every January together, and so on), and each is calculated
+  group by group in a loop, not with one global average.
 
 Each step writes its own log line with the number of rows affected and the reason.
 
@@ -41,7 +42,8 @@ in °C, rain, snow, low-visibility, precipitation and severe-weather flags, one-
 versions of temperature (z-score), cloud cover and rainfall (0–1).
 
 **Three congestion definitions, kept distinct.** Policy-facing: volume above 5,500 (15.1% of hours). Dashboard-facing:
-bands at 4,500 and 5,500. Modelling construct: quartiles of volume (1,249 / 3,428 / 4,952) giving Low, Medium,
+bands at 4,500 and 5,500. Modelling construct: quartiles of volume (1,249 / 3,428 / 4,952; Part 1's 1,248 / 3,427 / 4,952 predates the two zero-traffic
+repairs) giving Low, Medium,
 High and Severe with about a quarter of the hours each. The cut-offs come from the data, so no hand-picked
 number is needed for the target.
 
@@ -71,6 +73,7 @@ command with its arguments and reports invalid input, such as a malformed date, 
 - Keeping one weather label per hour discards the less severe labels. This favours bad-weather hours and is stated
   so Part 3 can account for it.
 - Smoke (2 hours) and squall (1 hour) are too rare for reliable averages; the weather chart leaves them out.
-- The 23 July 2016 anomaly (very low traffic all day) remains in the data apart from the two zero readings and still
-  needs checking with the data owner.
+- From 22:00 on 22 July to about 17:00 on 24 July 2016 (44 hours), traffic is mostly tiny (28 hours under 100 vehicles),
+  likely a sensor or road outage. It stays in the data apart from the two replaced zeros (placeholders). It needs
+  checking with the data owner; Part 3 should exclude or flag the whole window.
 - Part 3 uses `traffic_clean.csv` and `traffic_features.csv`, the shared weather groups and the seed in `config.py`.

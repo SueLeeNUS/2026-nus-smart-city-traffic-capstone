@@ -74,14 +74,35 @@ Clouds > Clear.**
 that calendar date: **1,203 holiday hours across 53 dates**. The change is logged as a WARNING with before and
 after counts.
 
-**Impossible values** are replaced with the median of valid values in the same calendar month (processed month
-by month in a loop):
+**Text standardisation.** Leading and trailing spaces are trimmed, `weather_main` is title-cased and
+`weather_description` is lower-cased. This changes the capitalisation of 1,730 raw rows ("Sky is Clear" becomes
+"sky is clear", 1,726 rows, and "SQUALLS" becomes "squalls", 4 rows) and does not change which row is kept for
+an hour or any number. The holiday text "None" is relabelled "No Holiday" (see above).
+
+**Impossible values** are replaced with the median of valid values in the same calendar month, **pooled across all
+years** (every January together, every February together and so on, not year by year). Each month is processed in a
+loop:
 
 | Problem | Rows | Rule |
 | --- | --- | --- |
 | Temperature of 0 K (-273 °C) | 10 | same-month median temperature |
 | Rainfall of 9,831 mm in one hour | 1 | same-month median rainfall |
-| Zero vehicles for a full hour (2016-07-23 at 18:00 and 23:00) | 2 | same-month **and same-hour** median traffic, because traffic depends strongly on the hour |
+| Zero vehicles for a full hour (2016-07-23 at 18:00 and 23:00) | 2 | same-month **and same-hour** median traffic (pooled across all years), because traffic depends strongly on the hour |
+
+In total 13 values are repaired. Temperature and rainfall follow the plain monthly-median rule. Traffic uses the
+month-and-hour median (also pooled across all years), a deliberate refinement of that rule: a zero at 18:00 should be replaced by a typical
+18:00 reading, not by a monthly figure that is mostly overnight and daytime hours. Rainfall comes out as 0.0 mm
+because July's median hourly rainfall is zero (most hours are dry).
+
+**Known anomaly: 22-24 July 2016.** The two zero-traffic hours sit inside a longer stretch that looks like a
+sensor or road outage. From 22:00 on 22 July to about 17:00 on 24 July (44 hours), hourly counts are mostly tiny:
+28 of the 44 hours are under 100 vehicles, against 7 of about 4,200 July hours outside the stretch. A typical July
+22:00 reading is about 2,200, but this stretch starts with 64 and 10 vehicles. Readings partly recover in the early
+mornings of 23 and 24 July (05:00 to 08:00), then collapse again. The two zeros were repaired as the rule above
+requires, but the repaired value at 18:00 (4,279) is far above its neighbours (5 vehicles at 17:00 and 1 at 19:00), so
+the repaired values should be read as placeholders. The other hours in the stretch are left unchanged and no rows are
+removed in Part 2. This stretch is suspect data: Part 3 should exclude or flag the whole window from 22 July 22:00 to
+24 July 17:00 and say so in its own documentation. It still needs checking with the data owner.
 
 **Three congestion definitions are kept separate on purpose:**
 
@@ -110,6 +131,45 @@ The cleaned Python output was compared hour by hour with the Part 1 SQLite view 
 
 The only differences are the 13 values the pipeline deliberately repairs (10 temperatures, 1 rainfall, 2 traffic
 readings). They explain the small gap in the mean.
+
+## Feature dictionary
+
+`traffic_features.csv` has 43 columns: the 9 cleaned columns plus 34 engineered ones.
+
+| Column(s) | Definition |
+| --- | --- |
+| `hour`, `day_of_week`, `month`, `year` | Parts of `date_time`. Day of week: Monday = 0 to Sunday = 6 |
+| `is_weekend` | 1 for Saturday and Sunday, otherwise 0 (Friday is a weekday) |
+| `is_rush_hour` | 1 on weekdays at 07:00, 08:00, 16:00, 17:00 or 18:00 (peaks seen in Part 1) |
+| `hour_sin`, `hour_cos`, `dow_sin`, `dow_cos`, `month_sin`, `month_cos` | Position on a circle for hour (24), day of week (7) and month (12), so 23:00 sits next to 00:00 and December next to January |
+| `is_holiday` | 1 if the holiday name is not "No Holiday" (filled across the whole calendar day) |
+| `temp_c` | Temperature in °C (`temp` in kelvin minus 273.15) |
+| `is_raining` | 1 if `rain_1h` is above 0 mm |
+| `is_snowing` | 1 if `snow_1h` is above 0 mm |
+| `is_low_visibility` | 1 if `weather_main` is Fog, Mist, Haze or Smoke |
+| `is_precipitation` | 1 if `weather_main` is Rain, Drizzle, Snow, Thunderstorm or Squall |
+| `is_severe_weather` | 1 if `weather_main` is Thunderstorm, Snow or Squall |
+| `weather_*` (11 columns) | One-hot encoding of `weather_main`, one 0/1 column per category |
+| `temp_c_scaled` | `temp_c` standardised (z-score: minus the mean, divided by the sample standard deviation, n - 1) |
+| `clouds_scaled` | `clouds_all` rescaled to 0-1 (minimum to maximum) |
+| `rain_scaled` | `log(1 + rain_1h)` rescaled to 0-1, because rainfall is very skewed |
+| `congestion_category` | Low, Medium, High or Severe from the traffic-volume quartiles (see Data decisions) |
+
+The weather groups are defined once in `config.py`. `is_low_visibility` and `is_precipitation` use the
+weather category of the chosen hourly row, while `is_raining` and `is_snowing` use the measured amounts. The
+two can disagree: 6,627 hours are labelled Rain, Snow, Thunderstorm, Drizzle or Squall but record 0 mm of rain
+(for example, a snow hour). `is_precipitation` therefore means "the weather label says precipitation", and
+`is_raining` means "rain was actually measured".
+
+### Scaling and data leakage (note for Part 3)
+
+The scaled columns and the quartile cut-offs in `congestion_category` are calculated on **all years**,
+including 2018. That suits Part 2, which describes the whole dataset and reconciles with the Part 1 numbers.
+It is not suitable for model evaluation, because Part 3 trains on 2017 and earlier and tests on 2018, and the
+test year should not influence how the training data is scaled. Part 3 therefore **refits any scaler on the
+training years only** and applies those fixed values to the test year. The Part 2 scaled columns and the
+quartile category are descriptive and should not be used to fit or evaluate a model unless recalculated on the
+training years.
 
 ## What the pipeline does
 
