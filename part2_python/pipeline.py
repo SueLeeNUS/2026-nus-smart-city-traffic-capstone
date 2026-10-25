@@ -88,13 +88,14 @@ def standardise_categoricals(df: pd.DataFrame) -> pd.DataFrame:
     df["holiday"] = df["holiday"].astype(str).str.strip().replace({"None": "No Holiday", "": "No Holiday"})
     df["weather_main"] = df["weather_main"].astype(str).str.strip().str.title()
     df["weather_description"] = df["weather_description"].astype(str).str.strip().str.lower()
-    changed = int((before.ne(df[["holiday", "weather_main", "weather_description"]])).any(axis=1).sum())
-    # 'None' -> 'No Holiday' is an intentional relabel, so count it separately
+    # 'None' -> 'No Holiday' is an intentional relabel, so it is counted separately from text clean-up
     relabelled = int((before["holiday"] == "None").sum())
+    text_cols = ["weather_main", "weather_description"]
+    text_changed = int(before[text_cols].ne(df[text_cols]).any(axis=1).sum())
     logger.info(
         "Standardised categoricals: %d holiday 'None' values relabelled 'No Holiday' "
-        "(a real value, not missing); %d rows otherwise changed in capitalisation/whitespace",
-        relabelled, max(changed - relabelled, 0),
+        "(a real value, not missing); %d rows had weather text changed in capitalisation/whitespace",
+        relabelled, text_changed,
     )
     return df
 
@@ -232,7 +233,7 @@ def _median_impute(df: pd.DataFrame, col: str, bad_mask: pd.Series, reason: str,
 
 
 def handle_outliers(df: pd.DataFrame) -> pd.DataFrame:
-    """Impossible values -> monthly median (see _monthly_median_impute)."""
+    """Impossible values -> monthly median (see _median_impute)."""
     df = _median_impute(
         df, "temp", (df["temp"] < MIN_TEMP_K) | (df["temp"] > MAX_TEMP_K),
         f"impossible temperature (outside {MIN_TEMP_K}-{MAX_TEMP_K} K, e.g. 0 K sensor error)")
