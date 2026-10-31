@@ -1,6 +1,6 @@
 # Capstone Part 3: Traffic Volume and Congestion-Risk Models
 
-Sue Lee · Smart City Traffic Intelligence capstone · I-94 westbound, Minneapolis–St Paul
+Sook Jing Lee · Smart City Traffic Intelligence capstone · I-94 westbound, Minneapolis–St Paul
 
 This folder builds the Part 3 models on the cleaned hourly file produced in Part 2. It predicts traffic volume,
 flags high-risk hours, looks for patterns, monitors drift and runs a small recommendation tool.
@@ -18,8 +18,9 @@ These rules shape every number in this folder.
    the clustering scaler and the LSTM scaler. The random forests do not need scaling.
 3. **Thresholds are computed from 2017 and earlier only, with one exception.** The quartile cut-offs are recomputed
    from training years at run time (`features.training_quartiles`): 1,249 / 3,415 / 4,954 vehicles/hour.
-   The **high-risk traffic threshold is the brief's fixed value, 3,427 vehicles/hour**, which is the all-years median.
-   This is the one exception to the rule. The training-years median (3,415) differs by 12 vehicles and is not used.
+   The **high-risk traffic threshold is the brief's fixed value, 3,427 vehicles/hour** (close to, but not exactly,
+   the all-years median of 3,428 on the cleaned data). This is the one exception to the rule. The training-years
+   median (3,415) differs by 12 vehicles and is not used.
 4. **Splits are chronological, never random.** Train on 2012–2017 (outage window excluded), test on 2018.
 5. **Holiday label.** Part 2 uses "No Holiday" for ordinary days. The feature `is_holiday` treats both "No Holiday"
    and the older text "None" as not a holiday, so a holiday cannot be missed by a label mismatch.
