@@ -1,0 +1,5 @@
+registered,version,model,task,test_2018,status,train_data
+2026-10-30,v1.0.0,random_forest_regressor,regression: traffic_volume,"MAE 224, R2 0.962",production (serves API),hourly rows dated <=2017
+2026-10-30,v1.0.0,ridge_regressor,regression: traffic_volume,"MAE 830, R2 0.716","baseline, retained",hourly rows dated <=2017
+2026-10-30,v1.0.0,random_forest_classifier,classification: high_risk,"PR-AUC 0.413, recall 0.727",production,hourly rows dated <=2017
+2026-10-30,v1.0.0,logistic_regression_classifier,classification: high_risk,"PR-AUC 0.284, recall 0.678","baseline, retained",hourly rows dated <=2017

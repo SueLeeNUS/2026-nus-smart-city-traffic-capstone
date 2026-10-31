@@ -1,0 +1,2 @@
+model,mae_2018,fidelity_r2_surrogate,persistence_mae_2018,explain_method
+lstm,229.155451,0.994532,588.419721,SHAP (TreeExplainer on surrogate)
