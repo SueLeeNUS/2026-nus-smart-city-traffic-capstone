@@ -1,6 +1,6 @@
 # Capstone Part 3: Traffic Volume and Congestion-Risk Models
 
-Sook Jing Lee · Smart City Traffic Intelligence capstone · I-94 westbound, Minneapolis–St Paul
+Sue Lee · Smart City Traffic Intelligence capstone · I-94 westbound, Minneapolis–St Paul
 
 This folder builds the Part 3 models on the cleaned hourly file produced in Part 2. It predicts traffic volume,
 flags high-risk hours, looks for patterns, monitors drift and runs a small recommendation tool.
@@ -133,9 +133,11 @@ python -m unittest discover -s tests -v
 
 Deep learning and MLflow could not run in the environment this project was written in (no PyPI access there), so
 they were run separately on Google Colab (`!pip install shap mlflow`; PyTorch is pre-installed there) and the
-results above are from that run. To repeat it: upload this folder to Colab, install `shap` and `mlflow`, then run
-`python run_all.py` the same way. The two saved `.skops` model files shared by a course mate are a different
-project's output and are not used here.
+results above are from that run. The notebook used for that run is included at `colab/Part3_DeepLearning_MLflow.ipynb`
+— it installs the extra packages, uploads this project, runs the tests and the full pipeline, and prints the
+deep-learning and MLflow results. To repeat it: open that notebook in Colab, run it, and upload this folder
+(as a zip) when prompted. The two saved `.skops` model files shared by a course mate are a different project's
+output and are not used here.
 
 **A version note for anyone re-running this on Colab or a newer machine:** MLflow 2.x+ refuses its plain-folder
 tracking backend by default and raises an error instead of simply not being available. `src/tracking.py` sets
