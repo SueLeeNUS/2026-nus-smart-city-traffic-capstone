@@ -1,6 +1,6 @@
 # Capstone Part 3: Traffic Volume and Congestion-Risk Models
 
-Sue Lee · Smart City Traffic Intelligence capstone · I-94 westbound, Minneapolis–St Paul
+Sook Jing Lee · Smart City Traffic Intelligence capstone · I-94 westbound, Minneapolis–St Paul
 
 This folder builds the Part 3 models on the cleaned hourly file produced in Part 2. It predicts traffic volume,
 flags high-risk hours, looks for patterns, monitors drift and runs a small recommendation tool.
