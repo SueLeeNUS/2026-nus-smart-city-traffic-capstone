@@ -1,6 +1,6 @@
 # Capstone Part 3: Traffic Volume and Congestion-Risk Models
 
-Sook Jing Lee · Smart City Traffic Intelligence capstone · I-94 westbound, Minneapolis–St Paul
+Sue Lee · Smart City Traffic Intelligence capstone · I-94 westbound, Minneapolis–St Paul
 
 This folder builds the Part 3 models on the cleaned hourly file produced in Part 2. It predicts traffic volume,
 flags high-risk hours, looks for patterns, monitors drift and runs a small recommendation tool.
@@ -112,9 +112,13 @@ Outputs: `outputs/metrics/lstm_metrics.csv`, `outputs/metrics/lstm_surrogate_imp
 - **Drift monitor (2018, by month):** compares each month with the same calendar month in the training years.
   Traffic volume stays stable. Cloud cover is reported as a coding check, because its share of code "1" rises
   in every 2018 month. A month with no rain recorded is flagged as a data gap (January to July 2018).
-  Temperature and rain shifts are reported as shifts, not coding faults. With cloud cover excluded from the drift
-  decision, January, March, April, May and June 2018 still raise an ALERT; this is driven mainly by the model's
-  error rising against the 2017 reference (for example +29.6% in January), not by the cleaned data itself drifting.
+  With cloud cover and gapped rainfall excluded from the drift decision, January, March, April, May and June 2018
+  still raise an ALERT. Most of these (March, May, June, and part of April) are driven by a genuine shift in that
+  year's temperature readings against the same calendar month in the training years, while the model's own
+  prediction error in those months was flat or better than the 2017 reference. Only January (and part of April)
+  shows the model's own prediction error rising against the 2017 reference (+29.6% in January, +31.9% in April)
+  with no matching temperature shift behind it — that is the one case that is genuinely "the model getting worse,"
+  not just the weather that year looking different.
 - **Experiment tracking:** every supervised, clustering and drift run is logged to MLflow (`mlruns_local/`), 7 runs
   in total across three experiments (`traffic-supervised`, `traffic-unsupervised`, `traffic-mlops`), confirmed
   `FINISHED` on a full Colab run. If MLflow is not installed, or fails to start for any reason, the project falls
