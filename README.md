@@ -46,8 +46,9 @@ results.
 The dataset has no accident or incident column, so **accident risk cannot be observed**. Part 3 predicts a proxy
 label instead:
 
-> `high_risk = 1` when, in the same hour, traffic volume is above **3,427 vehicles per hour** (the brief's fixed
-> value) **and** the weather is Thunderstorm, Snow or Squall, or low visibility (Fog, Mist, Haze or Smoke).
+> `high_risk = 1` when, in the same hour, traffic volume is above **3,427 vehicles per hour** (the quartile value
+> from the instructor's Plan of Attack) **and** the weather is Thunderstorm, Snow or Squall, or low visibility
+> (Fog, Mist, Haze or Smoke).
 
 What this means for anyone reading the results:
 
@@ -55,9 +56,9 @@ What this means for anyone reading the results:
   poor conditions", not accidents.
 - A model that predicts it from time and weather partly re-discovers the rule that created it. For that reason the
   classifier does not receive the weather category, `traffic_volume` or snow, which define the label.
-- It marks **3,133 of 40,575 hours (7.7%)**, and **594 of 6,533 test hours (9.1%)** in 2018. The brief's example
-  quotes 7.3% (2,964 hours) using the first row in the file for each hour. This project keeps the most severe weather
-  per hour, as in Part 2, and the instructor confirmed the 3,133 count.
+- It marks **3,133 of 40,575 hours (7.7%)**, and **594 of 6,533 test hours (9.1%)** in 2018. The instructor's Plan
+  of Attack states 7.3% (2,964 hours) using the first row in the file for each hour. This project keeps the most
+  severe weather per hour, as in Part 2, and the instructor confirmed the 3,133 count.
 - Because only about one hour in eleven is positive, accuracy is misleading (always answering "no" scores 90.9% on
   the test year). The classifier is judged on precision, recall and PR-AUC.
 

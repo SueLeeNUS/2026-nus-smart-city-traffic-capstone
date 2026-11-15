@@ -62,8 +62,9 @@ label; it is given only time features plus the measured temperature, rainfall an
 
 ## 4. The high-risk label
 
-`high_risk` was confirmed with the instructor as: traffic above the median (3,427 vehicles/hour, the top half of
-the data) **and** adverse weather (Thunderstorm, Snow, Squall, Fog, Mist, Haze or Smoke) in the same hour. Using
+`high_risk` was confirmed with the instructor as: traffic above 3,427 vehicles/hour (the quartile value from the
+instructor's Plan of Attack, the top half of the data — close to, but not exactly, the cleaned data's all-years
+median of 3,428) **and** adverse weather (Thunderstorm, Snow, Squall, Fog, Mist, Haze or Smoke) in the same hour. Using
 Part 2's rule of keeping the most severe weather label per hour, this gives **3,133 of 40,575 hours (7.7%)**.
 
 ## 5. Unsupervised learning
