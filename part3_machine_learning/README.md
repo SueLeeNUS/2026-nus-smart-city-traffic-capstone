@@ -141,8 +141,7 @@ they were run separately on Google Colab (`!pip install shap mlflow`; PyTorch is
 results above are from that run. The notebook used for that run is included at `colab/Part3_DeepLearning_MLflow.ipynb`
 — it installs the extra packages, uploads this project, runs the tests and the full pipeline, and prints the
 deep-learning and MLflow results. To repeat it: open that notebook in Colab, run it, and upload this folder
-(as a zip) when prompted. The two saved `.skops` model files shared by a course mate are a different project's
-output and are not used here.
+(as a zip) when prompted. 
 
 **A version note for anyone re-running this on Colab or a newer machine:** MLflow 2.x+ refuses its plain-folder
 tracking backend by default and raises an error instead of simply not being available. `src/tracking.py` sets
