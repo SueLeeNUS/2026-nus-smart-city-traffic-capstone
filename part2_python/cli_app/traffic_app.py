@@ -55,7 +55,7 @@ def cmd_at(df: pd.DataFrame, args: argparse.Namespace) -> None:
     if row.empty:
         raise UserInputError(
             f"No record for {when}. Data covers {df['date_time'].min()} to {df['date_time'].max()} "
-            "and has gaps (for example Aug 2014 to Jun 2015).")
+            "and has gaps (for example Sep 2014 to May 2015).")
     r = row.iloc[0]
     print(f"Time:        {r['date_time']}  ({DAY_NAMES[int(r['day_of_week'])]})")
     print(f"Traffic:     {int(r['traffic_volume']):,} vehicles/hour  ({r['congestion_category']} congestion)")
