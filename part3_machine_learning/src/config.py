@@ -36,7 +36,7 @@ CONGESTION_THRESHOLD = 5500          # fixed, policy-facing: volume above 5,500
 BAND_LOW_MAX = 4500                  # dashboard bands: Low <= 4,500 < Medium <= 5,500 < High
 QUARTILE_FALLBACK = (1248, 3427, 4952)  # reference quartiles, logged and checked at run time
 
-# High-risk traffic threshold: the Q2 quartile value from the instructor's Plan of Attack
+# High-risk traffic threshold: 3,427, the median hourly volume from Part 1
 # (1,248 / 3,427 / 4,952, one of the three required congestion definitions, computed on the
 # unrepaired data; close to, but not exactly, the cleaned data's all-years median of 3,428).
 # This is the one exception to the 2017-and-earlier rule; the training-years median is 3,415

@@ -65,8 +65,7 @@ def training_quartiles(df: pd.DataFrame) -> tuple:
 def add_labels(df: pd.DataFrame) -> pd.DataFrame:
     """Targets and congestion categories. Only applied when traffic_volume is present.
     Quartile cut-offs come from training years only. The high-risk traffic threshold is 3,427,
-    the quartile value from the instructor's Plan of Attack, not the training-years-only cut-off
-    above (see README)."""
+    the median hourly volume from Part 1, not the training-years-only cut-off above (see README)."""
     df = df.copy()
     v = df["traffic_volume"]
     df["congested"] = (v > config.CONGESTION_THRESHOLD).astype(int)

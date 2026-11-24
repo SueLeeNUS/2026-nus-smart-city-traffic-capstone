@@ -18,9 +18,9 @@ These rules shape every number in this folder.
    the clustering scaler and the LSTM scaler. The random forests do not need scaling.
 3. **Thresholds are computed from 2017 and earlier only, with one exception.** The quartile cut-offs are recomputed
    from training years at run time (`features.training_quartiles`): 1,249 / 3,415 / 4,954 vehicles/hour.
-   The **high-risk traffic threshold is 3,427 vehicles/hour, the quartile value from the instructor's Plan of
-   Attack** (one of the three required congestion definitions, computed on the unrepaired data; close to, but
-   not exactly, the all-years median of 3,428 on the cleaned data). This is the one exception to the rule. The
+   The **high-risk traffic threshold is 3,427 vehicles/hour, the median hourly volume from Part 1** (one of the
+   three required congestion definitions, computed on the unrepaired data; close to, but not exactly, the
+   all-years median of 3,428 on the cleaned data). This is the one exception to the rule. The
    training-years median (3,415) differs by 12 vehicles and is not used.
 4. **Splits are chronological, never random.** Train on 2012–2017 (outage window excluded), test on 2018.
 5. **Holiday label.** Part 2 uses "No Holiday" for ordinary days. The feature `is_holiday` treats both "No Holiday"
@@ -28,14 +28,13 @@ These rules shape every number in this folder.
 
 ## The high-risk label
 
-`high_risk` equals 1 when **both** conditions hold in the same hour (confirmed by the instructor):
+`high_risk` equals 1 when **both** conditions hold in the same hour, a design choice made for this project:
 
 - **Traffic:** volume above 3,427 vehicles/hour (the top half of the hourly data, not the top quartile).
 - **Weather:** Thunderstorm, Snow or Squall, or low visibility (Fog, Mist, Haze or Smoke).
 
-Each hour keeps its most severe weather label (the Part 2 rule). This gives **3,133 of 40,575 hours (7.7%)**, as
-the instructor confirmed. A first-row-in-file rule would give 2,964 (7.3%), the figure stated in the instructor's
-Plan of Attack; it is not used here.
+Each hour keeps its most severe weather label (the Part 2 rule). This gives **3,133 of 40,575 hours (7.7%)**.
+A first-row-in-file rule would give 2,964 (7.3%) instead; it is not used here.
 
 ## Inputs and outputs
 

@@ -28,9 +28,9 @@ Minnesota) also means the model has no evidence at all about how its patterns wo
 
 ## 2. The label is a judgement, not a fact
 
-`high_risk` is defined as traffic above 3,427 vehicles/hour **and** adverse weather (Thunderstorm, Snow, Squall,
-or low visibility — Fog, Mist, Haze, Smoke), confirmed with the instructor. It encodes two choices that are not
-neutral:
+`high_risk` is defined as traffic above 3,427 vehicles/hour — the median hourly volume from Part 1 (3,428 on
+the cleaned data) — **and** adverse weather (Thunderstorm, Snow, Squall, or low visibility — Fog, Mist, Haze,
+Smoke), a design choice made for this project. It encodes two choices that are not neutral:
 
 - **Which weather counts as adverse.** Drizzle and ordinary rain are not included, only the more severe or
   visibility-reducing categories. A different, equally reasonable choice of categories would change which hours

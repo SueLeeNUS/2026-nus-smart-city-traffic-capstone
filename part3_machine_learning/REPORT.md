@@ -26,8 +26,8 @@ it, and they are checked by a 16-test suite before any model runs:
   autocorrelated, so a random split would leak adjacent hours between the two sets and inflate every score.
 - **Every scaler and threshold is fitted on training years only** (2012–2017, outage window excluded), including
   the classifier's and regressor's scalers, the clustering scaler, and the quartile cut-offs used for the
-  congestion category. The one documented exception is the high-risk traffic threshold, fixed at the instructor's
-  confirmed value of 3,427 vehicles/hour (see Section 4).
+  congestion category. The one documented exception is the high-risk traffic threshold, fixed at 3,427
+  vehicles/hour — the median hourly volume from Part 1 (3,428 on the cleaned data) (see Section 4).
 
 ## 3. Supervised learning
 
@@ -62,10 +62,11 @@ label; it is given only time features plus the measured temperature, rainfall an
 
 ## 4. The high-risk label
 
-`high_risk` was confirmed with the instructor as: traffic above 3,427 vehicles/hour (the quartile value from the
-instructor's Plan of Attack, the top half of the data — close to, but not exactly, the cleaned data's all-years
-median of 3,428) **and** adverse weather (Thunderstorm, Snow, Squall, Fog, Mist, Haze or Smoke) in the same hour. Using
-Part 2's rule of keeping the most severe weather label per hour, this gives **3,133 of 40,575 hours (7.7%)**.
+`high_risk` is defined as: traffic above 3,427 vehicles/hour — the median hourly volume from Part 1 (3,428 on
+the cleaned data), the top half of the data — **and** adverse weather (Thunderstorm, Snow, Squall, Fog, Mist,
+Haze or Smoke) in the same hour. This is our own design choice, built on top of the formulas the brief sets out
+for the congestion category and the proxy accident-risk label. Using Part 2's rule of keeping the most severe
+weather label per hour, this gives **3,133 of 40,575 hours (7.7%)**.
 
 ## 5. Unsupervised learning
 
