@@ -33,9 +33,9 @@ results.
 4. **A suspect stretch is excluded from modelling.** From 22:00 on 22 July 2016 to about 17:00 on 24 July 2016
    (44 hours), 28 hours record fewer than 100 vehicles, against 7 of about 4,200 July hours elsewhere. It is probably a
    sensor or road outage. Part 3 keeps the rows but excludes them from training and testing.
-5. **Chronological splits and no leakage.** Part 3 trains on 2012 to 2017 and tests on 2018. Scalers and thresholds
-   are fitted on the training years only. A random split would let the model see hours next to the ones it is tested
-   on.
+5. **Chronological splits and no leakage.** Part 3 trains on 2012 to 2017 and tests on 2018. Scalers and quartile
+   cut-offs are fitted on the training years only; the one exception is the fixed 3,427 high-risk threshold (Part 1's
+   median). A random split would let the model see hours next to the ones it is tested on.
 6. **Three congestion definitions, kept distinct.** (a) Fixed threshold of more than 5,500 vehicles an hour, used for
    policy-facing probabilities (15.1% of hours). (b) Dashboard bands: Low below 4,500, Medium 4,500 to 5,500, High above
    5,500. (c) Quartiles of volume, a modelling construct: 1,248 / 3,427 / 4,952 on the unrepaired data in Part 1 and
@@ -46,9 +46,9 @@ results.
 The dataset has no accident or incident column, so **accident risk cannot be observed**. Part 3 predicts a proxy
 label instead:
 
-> `high_risk = 1` when, in the same hour, traffic volume is above **3,427 vehicles per hour** (the quartile value
-> from the instructor's Plan of Attack) **and** the weather is Thunderstorm, Snow or Squall, or low visibility
-> (Fog, Mist, Haze or Smoke).
+> `high_risk = 1` when, in the same hour, traffic volume is above **3,427 vehicles per hour** (the median hourly
+> volume found in Part 1, so the busier half of hours) **and** the weather is Thunderstorm, Snow or Squall, or low
+> visibility (Fog, Mist, Haze or Smoke).
 
 What this means for anyone reading the results:
 
@@ -56,9 +56,9 @@ What this means for anyone reading the results:
   poor conditions", not accidents.
 - A model that predicts it from time and weather partly re-discovers the rule that created it. For that reason the
   classifier does not receive the weather category, `traffic_volume` or snow, which define the label.
-- It marks **3,133 of 40,575 hours (7.7%)**, and **594 of 6,533 test hours (9.1%)** in 2018. The instructor's Plan
-  of Attack states 7.3% (2,964 hours) using the first row in the file for each hour. This project keeps the most
-  severe weather per hour, as in Part 2, and the instructor confirmed the 3,133 count.
+- It marks **3,133 of 40,575 hours (7.7%)**, and **594 of 6,533 test hours (9.1%)** in 2018. Keeping the first row
+  in the file for each hour instead would give 7.3% (2,964 hours). This project keeps the most severe weather per
+  hour, as in Part 2, which gives the 3,133 count.
 - Because only about one hour in eleven is positive, accuracy is misleading (always answering "no" scores 90.9% on
   the test year). The classifier is judged on precision, recall and PR-AUC.
 
