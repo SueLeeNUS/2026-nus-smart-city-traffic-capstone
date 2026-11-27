@@ -77,9 +77,10 @@ Checks that should hold after the view is created:
   hour; Saturday 2,816; Sunday 2,458.
 - **Temperature is a weak predictor.** The correlation with traffic is 0.14 (r squared about 0.02). Within each hour
   of the day it stays weak.
-- **Weather has a modest effect.** Fog (2,654), mist, snow and thunderstorms average below the overall 3,291.
-  Congestion (above 5,500 vehicles) is somewhat less likely in clear weather than in clouds (odds ratio 0.74), but the
-  link is partly explained by when each weather type occurs.
+- **Weather has a modest effect.** Fog (2,654) and mist are lowest, but most fog falls between midnight and 08:00,
+  when traffic is low anyway. Snow and thunderstorms are only slightly below clear weather (3,055). Congestion (above
+  5,500 vehicles) is somewhat less likely in clear weather than in clouds (odds ratio 0.74), but the link is partly
+  explained by when each weather type occurs.
 - **Holidays are quiet.** Whole-day traffic on the holidays analysed is about 25% to 50% below the year's average.
 - **Congestion** (above 5,500 vehicles per hour) occurs in about 15% of hours, concentrated in weekday rush hours.
 
