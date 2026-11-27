@@ -96,10 +96,12 @@ SELECT COUNT(*)                                   AS n,
 FROM traffic_hourly;
 
 -- Task 2.1b: median of traffic_volume
+-- One middle row when the count is odd (40,575 rows, so 3,427), the mean of the two middle rows when even.
 SELECT AVG(traffic_volume) AS median_volume
 FROM (SELECT traffic_volume FROM traffic_hourly
       ORDER BY traffic_volume
-      LIMIT 2 OFFSET (SELECT (COUNT(*) - 1) / 2 FROM traffic_hourly));
+      LIMIT 2 - (SELECT COUNT(*) FROM traffic_hourly) % 2
+      OFFSET (SELECT (COUNT(*) - 1) / 2 FROM traffic_hourly));
 
 -- Task 2.1c: standard deviation = square root of the sample variance
 SELECT ROUND(SQRT((AVG(traffic_volume * traffic_volume)
